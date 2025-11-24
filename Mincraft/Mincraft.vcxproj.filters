@@ -16,6 +16,12 @@
     <Filter Include="Camera">
       <UniqueIdentifier>{202577d7-b115-4480-b740-91d07aee2e89}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Chunk">
+      <UniqueIdentifier>{2ed9d40e-854f-4333-aba5-cf1ec3194ab2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{18cc81ec-97b4-4bac-974b-d66ccd0610de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -27,6 +33,12 @@
     <ClCompile Include="callbacks.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Chunk\Chunk.cpp">
+      <Filter>Chunk</Filter>
+    </ClCompile>
+    <ClCompile Include="Chunk\ChunkManager.cpp">
+      <Filter>Chunk</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera\Camera.h">
@@ -35,5 +47,25 @@
     <ClInclude Include="callbacks.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Chunk\Block.h">
+      <Filter>Chunk</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk\Chunk.h">
+      <Filter>Chunk</Filter>
+    </ClInclude>
+    <ClInclude Include="Chunk\ChunkManager.h">
+      <Filter>Chunk</Filter>
+    </ClInclude>
+    <ClInclude Include="MyShader.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Block.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Block.vert">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

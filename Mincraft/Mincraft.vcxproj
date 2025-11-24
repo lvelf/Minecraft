@@ -125,11 +125,21 @@
   <ItemGroup>
     <ClCompile Include="callbacks.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="Chunk\Chunk.cpp" />
+    <ClCompile Include="Chunk\ChunkManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callbacks.h" />
     <ClInclude Include="Camera\Camera.h" />
+    <ClInclude Include="Chunk\Block.h" />
+    <ClInclude Include="Chunk\Chunk.h" />
+    <ClInclude Include="Chunk\ChunkManager.h" />
+    <ClInclude Include="MyShader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Block.frag" />
+    <None Include="Shaders\Block.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
