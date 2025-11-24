@@ -3,6 +3,9 @@
 #include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <array>
 
 const int CHUNK_SIZE_X = 16;
 const int CHUNK_SIZE_Y = 16;
@@ -20,8 +23,19 @@ struct ChunkPos {
 	}
 };
 
+enum class FaceDir {
+	PosX, NegX,
+	PosY, NegY,
+	PosZ, NegZ
+
+};
+
 struct Vertex {
 	float x, y, z;
+
+	Vertex(const glm::vec3& pos) : x(pos.x), y(pos.y), z(pos.z) {}
+
+	Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
 };
 
 class Chunk {
@@ -61,6 +75,11 @@ public:
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 
+	//mesh
 	void buildMesh(); // generate vertices/indices and upload to GPU
+	void addFace(int wx, int wy, int wz, FaceDir dir); // world block position + dir
+
+	bool isAirLocal(int lx, int ly, int lz) const; // whether need to be drawn
+
 	void render(); // bind VAO + Draw
 };

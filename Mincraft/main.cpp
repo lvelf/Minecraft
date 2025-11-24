@@ -7,7 +7,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include "Camera.h"
+#include "Camera/Camera.h"
 #include "callbacks.h"
 #include "Chunk/ChunkManager.h"
 #include "MyShader.h"
@@ -17,22 +17,62 @@
 int windowLength = 1200;
 int windowHeight = 1200;
 
+static ChunkManager chunkManager;
+static bool worldInitialized = false;
+void CreateExampleWorld();
+
 void Init() {
 	glEnable(GL_DEPTH_TEST);
+
+	CreateExampleWorld();
+
+	worldInitialized = true;
+}
+
+void CreateExampleWorld() {
+	int minX = -16;
+	int maxX = 16;
+	int minZ = -16;
+	int maxZ = 16;
+
+	for (int x = minX; x < maxX; ++x) {
+		for (int z = minZ; z < maxZ; ++z) {
+			int groundY = 0;
+			
+
+			// y < -3: Stone
+			for (int y = -8; y < -3; ++y) {
+				chunkManager.setBlockWorld(x, y, z, BlockType::Stone);
+			}
+
+			// -3 <= y < -1: Dirt
+			for (int y = -3; y < -1; ++y) {
+				chunkManager.setBlockWorld(x, y, z, BlockType::Dirt);
+			}
+
+			chunkManager.setBlockWorld(x, -1, z, BlockType::Grass);
+
+		}
+	}
+
+
+	for (int x = -5; x <= 5; ++x) {
+		for (int z = -5; z <= 5; ++z) {
+			int height = 1 + (std::abs(x) + std::abs(z)) % 4; 
+			for (int h = 0; h < height; ++h) {
+				chunkManager.setBlockWorld(x, -1 + h, z, BlockType::Dirt);
+			}
+			
+			chunkManager.setBlockWorld(x, -1 + height, z, BlockType::Grass);
+		}
+	}
 }
 
 void display(int width, int height) {
 	static MyShader blockShader("./Shaders/Block.vert", "./Shaders/Block.frag");
-	static ChunkManager chunkManager;
-
-	ChunkPos pos{ 0,0,0 };
-	chunkManager.getOrCreateChunk(pos, BlockType::Stone);
-
-	static bool worldInitialized = false;
+	
 	if (!worldInitialized) {
-		ChunkPos pos{ 0, 0, 0 };
-		chunkManager.getOrCreateChunk(pos, BlockType::Stone);
-
+		CreateExampleWorld();
 		worldInitialized = true;
 	}
 
@@ -40,8 +80,12 @@ void display(int width, int height) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//default setting for camera
-	glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 10.0f); 
-	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); 
+	//glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 10.0f); 
+	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); 
+
+	glm::vec3 cameraPos = glm::vec3(0.0f, 25.0f, 40.0f);
+	glm::vec3 cameraTarget = glm::vec3(0.0f, -5.0f, 0.0f); 
+
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); 
 
 	glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
