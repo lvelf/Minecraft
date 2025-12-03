@@ -37,12 +37,15 @@ struct Vertex {
 	glm::vec3 normal;
 	glm::vec2 uv;
 
+	glm::vec3 tangent;
+	glm::vec3 bitangent;
+
 	//Vertex(const glm::vec3& pos) : x(pos.x), y(pos.y), z(pos.z) {}
 
 	//Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
 
-	Vertex(const glm::vec3 pos, const glm::vec3 n, const glm::vec2 uv) :
-		position(pos), normal(n), uv(uv) {}
+	Vertex(const glm::vec3 pos, const glm::vec3 n, const glm::vec2 uv, const glm::vec3 tangent, const glm::vec3 bitangent) :
+		position(pos), normal(n), uv(uv), tangent(tangent), bitangent(bitangent){}
 };
 
 // Tile uv in atlas

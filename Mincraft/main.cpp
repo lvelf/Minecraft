@@ -24,6 +24,7 @@ void LoadTexture();
 
 // Texture
 GLuint gStoneTex = 0;
+GLuint gNormalTex = 0;
 
 void Init() {
 	glEnable(GL_DEPTH_TEST);
@@ -111,7 +112,34 @@ void LoadTexture() {
 	SOIL_free_image_data(data);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+
+	// normal map
+	data = SOIL_load_image("../data/blocks_normal.png",
+		&w, &h, &channels,
+		SOIL_LOAD_RGBA);
+	if (!data) {
+		std::cerr << "Failed to load blocks_normal png" << std::endl;
+		return;
+	}
+
+	glGenTextures(1, &gNormalTex);
+	glBindTexture(GL_TEXTURE_2D, gNormalTex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	// Wrapping
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	SOIL_free_image_data(data);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
+
 
 void display(int width, int height) {
 	static MyShader blockShader("./Shaders/Block.vert", "./Shaders/Block.frag");
@@ -154,10 +182,15 @@ void display(int width, int height) {
 	blockShader.setMat4("uView", view);
 	blockShader.setMat4("uProjection", projection);
 	
-	//texture + light
+	//texture
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gStoneTex);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, gNormalTex);
 	blockShader.setInt("uDiffuseTex", 0);
+	blockShader.setInt("uNormalMap", 1);
+	//light
 	blockShader.setVec3("uLightDir", sunDir);
 	blockShader.setFloat("uTime", time);
 

@@ -3,8 +3,11 @@
 in vec3 vWorldPos;
 in vec3 vNormal;
 in vec2 vUV;
+in vec3 vTangent;
+in vec3 vBiTangent;
 
 uniform sampler2D uDiffuseTex;
+uniform sampler2D uNormalMap;
 uniform vec3 uLightDir; 
 uniform float uTime;
 uniform vec3 uCameraPos;
@@ -44,8 +47,17 @@ void main() {
         uv = waterMin + waterSize * eps + localUV * innerSize;
     }
 
+    // normal mapping 
+    vec3 mapN = texture(uNormalMap, uv).xyz * 2.0f - 1.0f;
+    vec3 N = normalize(vNormal);
+    vec3 T = normalize(vTangent);
+    vec3 B = normalize(vBiTangent);
+    mat3 TBN = mat3(T, B, N);
     // normal 
-    vec3 norm = normalize(vNormal);
+    
+    vec3 norm = normalize(TBN * mapN);
+
+    //vec3 norm = normalize(vNormal);
     vec3 lightDir = normalize(-uLightDir);
     vec3 viewDir = normalize(uCameraPos - vWorldPos);
     vec3 H = normalize(lightDir + viewDir);

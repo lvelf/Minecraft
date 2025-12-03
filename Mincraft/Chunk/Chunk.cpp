@@ -106,14 +106,41 @@ void Chunk::addFace(int wx, int wy, int wz, FaceDir dir, BlockType type) {
 	}
 
 	// normal
+
 	glm::vec3 normal;
+	glm::vec3 tangent;
+	glm::vec3 bitangent;
 	switch (dir) {
-	case FaceDir::PosX: normal = glm::vec3(1, 0, 0); break;
-	case FaceDir::NegX: normal = glm::vec3(-1, 0, 0); break;
-	case FaceDir::PosY: normal = glm::vec3(0, 1, 0); break;
-	case FaceDir::NegY: normal = glm::vec3(0, -1, 0); break;
-	case FaceDir::PosZ: normal = glm::vec3(0, 0, 1); break;
-	case FaceDir::NegZ: normal = glm::vec3(0, 0, -1); break;
+	case FaceDir::PosX:
+		normal = glm::vec3(1, 0, 0);
+		tangent = glm::vec3(0, 0, 1);
+		bitangent = glm::vec3(0, 1, 0);
+		break;
+	case FaceDir::NegX:
+		normal = glm::vec3(-1, 0, 0);
+		tangent = glm::vec3(0, 0, -1);
+		bitangent = glm::vec3(0, 1, 0);
+		break;
+	case FaceDir::PosY:
+		normal = glm::vec3(0, 1, 0);
+		tangent = glm::vec3(1, 0, 0);
+		bitangent = glm::vec3(0, 0, -1);
+		break;
+	case FaceDir::NegY:
+		normal = glm::vec3(0, -1, 0);
+		tangent = glm::vec3(1, 0, 0);
+		bitangent = glm::vec3(0, 0, 1);
+		break;
+	case FaceDir::PosZ:
+		normal = glm::vec3(0, 0, 1);
+		tangent = glm::vec3(1, 0, 0);
+		bitangent = glm::vec3(0, 1, 0);
+		break;
+	case FaceDir::NegZ:
+		normal = glm::vec3(0, 0, -1);
+		tangent = glm::vec3(-1, 0, 0);
+		bitangent = glm::vec3(0, 1, 0);
+		break;
 	}
 
 	// uv
@@ -219,7 +246,7 @@ void Chunk::addFace(int wx, int wy, int wz, FaceDir dir, BlockType type) {
 	unsigned int startIndex = static_cast<unsigned int>(vertices.size());
 
 	for (int i = 0; i < 4; i++) {
-		vertices.push_back(Vertex{ faceVerts[i], normal, faceUV[i]});
+		vertices.push_back(Vertex{ faceVerts[i], normal, faceUV[i], tangent, bitangent});
 	}
 
 	// 2 triangles 
@@ -310,6 +337,26 @@ void Chunk::buildMesh() {
 			(void*)offsetof(Vertex, uv)
 		);
 
+		// layout = 3 tangent
+		glEnableVertexAttribArray(3);
+		glVertexAttribPointer(
+			3,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(Vertex),
+			(void*)offsetof(Vertex, tangent)
+		);
+		// layout = 4 bitangent
+		glEnableVertexAttribArray(4);
+		glVertexAttribPointer(
+			4,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(Vertex),
+			(void*)offsetof(Vertex, bitangent)
+		);
 
 		glBindVertexArray(0);
 	}
