@@ -219,34 +219,38 @@ void Chunk::addFace(int wx, int wy, int wz, FaceDir dir, BlockType type) {
 		};
 		break;
 	}
-	static int debug1 = 0;
-	if (debug1 <= 10 && type == BlockType::Grass) {
-		std::cout << "================================Grass======================" << std::endl;
-		std::cout << faceUV[0].x << " " << faceUV[0].y << std::endl;
-		std::cout << faceUV[1].x << " " << faceUV[1].y << std::endl;
-		std::cout << faceUV[2].x << " " << faceUV[2].y << std::endl;
-		std::cout << faceUV[3].x << " " << faceUV[3].y << std::endl;
-		std::cout << "======================================================" << std::endl;
-		debug1++;
-	}
-
-	static int debug2 = 0;
-	if (debug2 <= 10 && type == BlockType::Dirt) {
-		std::cout << "==============================Dirt======================" << std::endl;
-		std::cout << faceUV[0].x << " " << faceUV[0].y << std::endl;
-		std::cout << faceUV[1].x << " " << faceUV[1].y << std::endl;
-		std::cout << faceUV[2].x << " " << faceUV[2].y << std::endl;
-		std::cout << faceUV[3].x << " " << faceUV[3].y << std::endl;
-		std::cout << "======================================================" << std::endl;
-		debug2++;
-	}
 	
+
+	// material
+	MaterialType mat = MaterialType::Default;
+	switch (type) {
+	case BlockType::Grass:
+		mat = MaterialType::Grass;
+		break;
+	case BlockType::Dirt:
+		mat = MaterialType::Dirt;
+		break;
+	case BlockType::Stone:
+		mat = MaterialType::Stone;
+		break;
+	case BlockType::Sand:
+		mat = MaterialType::Sand;
+		break;
+	case BlockType::Water:
+		mat = MaterialType::Water;
+		break;
+	case BlockType::StoneBricks:
+		mat = MaterialType::StoneBricks;
+		break;
+	default:
+		mat = MaterialType::Default;
+	}
 
 
 	unsigned int startIndex = static_cast<unsigned int>(vertices.size());
 
 	for (int i = 0; i < 4; i++) {
-		vertices.push_back(Vertex{ faceVerts[i], normal, faceUV[i], tangent, bitangent});
+		vertices.push_back(Vertex{ faceVerts[i], normal, faceUV[i], tangent, bitangent, mat});
 	}
 
 	// 2 triangles 
@@ -356,6 +360,16 @@ void Chunk::buildMesh() {
 			GL_FALSE,
 			sizeof(Vertex),
 			(void*)offsetof(Vertex, bitangent)
+		);
+		//layout = 6 material
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(
+			5,
+			1,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(Vertex),
+			(void*)offsetof(Vertex, material)
 		);
 
 		glBindVertexArray(0);

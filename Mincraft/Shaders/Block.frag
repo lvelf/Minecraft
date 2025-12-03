@@ -5,6 +5,7 @@ in vec3 vNormal;
 in vec2 vUV;
 in vec3 vTangent;
 in vec3 vBiTangent;
+flat in int vMaterial;
 
 uniform sampler2D uDiffuseTex;
 uniform sampler2D uNormalMap;
@@ -13,6 +14,36 @@ uniform float uTime;
 uniform vec3 uCameraPos;
 
 out vec4 FragColor;
+
+void getMaterialParams(int matID, out float roughness, out float F0_base) {
+    roughness = 0.6;
+    F0_base        = 0.04;
+    
+    if (matID == 1) {         // Grass
+        roughness = 0.7;
+        F0_base = 0.03;
+    }
+    else if (matID == 2) {    // Dirt
+        roughness = 0.8;
+        F0_base = 0.03;
+    }
+    else if (matID == 3) {    // Stone
+        roughness = 0.6;
+        F0_base = 0.04;
+    }
+    else if (matID == 4) {    // Water
+        roughness = 0.05;     
+        F0_base = 0.02;     
+    }
+    else if (matID == 5) {    // Sand
+        roughness = 0.9;
+        F0_base  = 0.03;
+    }
+    else if (matID == 6) {    // StoneBricks
+        roughness = 0.5;
+        F0_base = 0.04;
+    }
+}
 
 
 void main() {
@@ -45,6 +76,8 @@ void main() {
         const float eps = 0.001;
         vec2 innerSize = waterSize * (1.0 - 2.0 * eps);
         uv = waterMin + waterSize * eps + localUV * innerSize;
+
+
     }
 
     // normal mapping 
@@ -75,12 +108,16 @@ void main() {
     vec3 ambient = vec3(0.3);
     vec3 diffuse = NoL * vec3(1.0);
 
+    // according to material to choose parameters
+    float roughness, F0_base;
+    getMaterialParams(vMaterial, roughness, F0_base);
+
     // Fresnel D G
-    float F0 = 0.04;                                
+    float F0 = F0_base;                                
     float F  = F0 + (1.0 - F0) * pow(1.0 - VoH, 5.0); 
 
     // Microfacet Distribution: Beckmann
-    float m  = 0.3;            
+    float m  = roughness;
     float m2 = m * m;
     float NoH2 = NoH * NoH;
     float NoH4 = NoH2 * NoH2;
@@ -109,4 +146,11 @@ void main() {
 
     color = pow(color, vec3(1.0/2.2));
     FragColor = vec4(color, 1.0);
+
+    // water
+    if (uv.x >= waterMin.x && uv.x <= waterMax.x &&
+        uv.y >= waterMin.y && uv.y <= waterMax.y) {
+        color *= vec3(0.6, 0.8, 1.2);
+        FragColor = vec4(color, 0.7);
+    }
 }

@@ -11,6 +11,16 @@ enum class BlockType : uint8_t {
 	StoneBricks
 };
 
+enum class MaterialType : int {
+	Default = 0,
+	Grass = 1,
+	Dirt,
+	Stone, 
+	Water, 
+	Sand,
+	StoneBricks
+};
+
 struct Block {
 	BlockType type;
 
