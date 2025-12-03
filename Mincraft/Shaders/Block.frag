@@ -1,17 +1,22 @@
 #version 330 core
 
 in vec3 vWorldPos;
+in vec3 vNormal;
+in vec2 vUV;
+
+uniform sampler2D uDiffuseTex;
+uniform vec3 uLightDir; 
 
 out vec4 FragColor;
 
 void main() {
-	if (vWorldPos.y < -3.5) {
-         FragColor = vec4(0.5, 0.5, 0.5, 1.0);   
-    }   
-    else if (vWorldPos.y < -1.5) {
-        FragColor = vec4(0.4, 0.25, 0.1, 1.0);  
-    }      
-    else {
-         FragColor = vec4(0.2, 0.7, 0.2, 1.0);      
-    }
+	
+	vec3 albedo = texture(uDiffuseTex, vUV).rgb;
+
+	vec3 N = normalize(vNormal);
+    vec3 L = normalize(-uLightDir);
+    float NdotL = max(dot(N, L), 0.0);
+    vec3 color = albedo * (0.1 + 0.9 * NdotL);
+
+    FragColor = vec4(color, 1.0);
 }

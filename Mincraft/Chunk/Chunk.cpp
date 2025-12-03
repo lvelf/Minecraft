@@ -75,10 +75,29 @@ void Chunk::addFace(int wx, int wy, int wz, FaceDir dir) {
 		break;
 	}
 
+	// normal
+	glm::vec3 normal;
+	switch (dir) {
+	case FaceDir::PosX: normal = glm::vec3(1, 0, 0); break;
+	case FaceDir::NegX: normal = glm::vec3(-1, 0, 0); break;
+	case FaceDir::PosY: normal = glm::vec3(0, 1, 0); break;
+	case FaceDir::NegY: normal = glm::vec3(0, -1, 0); break;
+	case FaceDir::PosZ: normal = glm::vec3(0, 0, 1); break;
+	case FaceDir::NegZ: normal = glm::vec3(0, 0, -1); break;
+	}
+
+	// uv
+	std::array<glm::vec2, 4> faceUV = {
+		glm::vec2(0.0f, 0.0f),
+		glm::vec2(0.0f, 1.0f),
+		glm::vec2(1.0f, 1.0f),
+		glm::vec2(1.0f, 0.0f),
+	};
+
 	unsigned int startIndex = static_cast<unsigned int>(vertices.size());
 
 	for (int i = 0; i < 4; i++) {
-		vertices.push_back(Vertex{ faceVerts[i] });
+		vertices.push_back(Vertex{ faceVerts[i], normal, faceUV[i]});
 	}
 
 	// 2 triangles 
@@ -133,6 +152,7 @@ void Chunk::buildMesh() {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
+		// layout = 0 position
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(
 			0,               // layout(location = 0)
@@ -140,8 +160,31 @@ void Chunk::buildMesh() {
 			GL_FLOAT,
 			GL_FALSE,
 			sizeof(Vertex),
-			(void*)0
+			(void*)offsetof(Vertex, position)
 		);
+
+		// layout = 1 normal
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(
+			1,
+			3,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(Vertex),
+			(void*)offsetof(Vertex, normal)
+		);
+
+		// layout = 2 uv
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(
+			2,
+			2,
+			GL_FLOAT,
+			GL_FALSE,
+			sizeof(Vertex),
+			(void*)offsetof(Vertex, uv)
+		);
+
 
 		glBindVertexArray(0);
 	}

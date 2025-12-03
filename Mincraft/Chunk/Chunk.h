@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <array>
+#include <cstddef>
 
 const int CHUNK_SIZE_X = 16;
 const int CHUNK_SIZE_Y = 16;
@@ -31,11 +32,17 @@ enum class FaceDir {
 };
 
 struct Vertex {
-	float x, y, z;
+	//float x, y, z;
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 uv;
 
-	Vertex(const glm::vec3& pos) : x(pos.x), y(pos.y), z(pos.z) {}
+	//Vertex(const glm::vec3& pos) : x(pos.x), y(pos.y), z(pos.z) {}
 
-	Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
+	//Vertex(float x, float y, float z) : x(x), y(y), z(z) {}
+
+	Vertex(const glm::vec3 pos, const glm::vec3 n, const glm::vec2 uv) :
+		position(pos), normal(n), uv(uv) {}
 };
 
 class Chunk {

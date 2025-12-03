@@ -20,10 +20,14 @@ int windowHeight = 1200;
 static ChunkManager chunkManager;
 static bool worldInitialized = false;
 void CreateExampleWorld();
+void LoadTexture();
+
+// Texture
+GLuint gStoneTex = 0;
 
 void Init() {
 	glEnable(GL_DEPTH_TEST);
-
+	LoadTexture();
 	CreateExampleWorld();
 
 	worldInitialized = true;
@@ -68,6 +72,39 @@ void CreateExampleWorld() {
 	}
 }
 
+void LoadTexture() {
+	int w, h, channels;
+	unsigned char* data = SOIL_load_image("../data/stone.png",
+		&w, &h, &channels,
+		SOIL_LOAD_RGBA);
+
+	if (!data) {
+		std::cerr << "Failed to load ./data/stone.png\n";
+		return;
+	}
+
+	// TODO: texture mapping
+	glGenTextures(1, &gStoneTex);
+	glBindTexture(GL_TEXTURE_2D, gStoneTex);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+		GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+
+	// Filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	// Wrapping
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	SOIL_free_image_data(data);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+}
+
 void display(int width, int height) {
 	static MyShader blockShader("./Shaders/Block.vert", "./Shaders/Block.frag");
 	
@@ -84,7 +121,9 @@ void display(int width, int height) {
 	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); 
 
 	glm::vec3 cameraPos = glm::vec3(0.0f, 25.0f, 40.0f);
+	//glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, -5.0f, 0.0f); 
+	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); 
 
@@ -97,11 +136,17 @@ void display(int width, int height) {
 	float farPlane = 100.0f;
 	glm::mat4 projection = glm::perspective(fov, aspect, nearPlane, farPlane);
 
+	
 
 	blockShader.Use();
 	blockShader.setMat4("uView", view);
 	blockShader.setMat4("uProjection", projection);
-
+	
+	//texture + light
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, gStoneTex);
+	blockShader.setInt("uDiffuseTex", 0);
+	blockShader.setVec3("uLightDir", glm::vec3(-1.0f, -1.0f, -0.3f));
 
 	chunkManager.renderAll();
 
