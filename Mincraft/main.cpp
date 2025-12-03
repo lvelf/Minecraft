@@ -43,9 +43,13 @@ void CreateExampleWorld() {
 		for (int z = minZ; z < maxZ; ++z) {
 			int groundY = 0;
 			
+			// y < -5: Stone
+			for (int y = -8; y < -5; ++y) {
+				chunkManager.setBlockWorld(x, y, z, BlockType::Sand);
+			}
 
 			// y < -3: Stone
-			for (int y = -8; y < -3; ++y) {
+			for (int y = -5; y < -3; ++y) {
 				chunkManager.setBlockWorld(x, y, z, BlockType::Stone);
 			}
 
@@ -54,7 +58,7 @@ void CreateExampleWorld() {
 				chunkManager.setBlockWorld(x, y, z, BlockType::Dirt);
 			}
 
-			chunkManager.setBlockWorld(x, -1, z, BlockType::Grass);
+			chunkManager.setBlockWorld(x, -1, z, BlockType::Water);
 
 		}
 	}
@@ -74,12 +78,12 @@ void CreateExampleWorld() {
 
 void LoadTexture() {
 	int w, h, channels;
-	unsigned char* data = SOIL_load_image("../data/stone.png",
+	unsigned char* data = SOIL_load_image("../data/blocks.png",
 		&w, &h, &channels,
 		SOIL_LOAD_RGBA);
 
 	if (!data) {
-		std::cerr << "Failed to load ./data/stone.png\n";
+		std::cerr << "Failed to load ../data/blocks.png\n";
 		return;
 	}
 
@@ -93,12 +97,16 @@ void LoadTexture() {
 
 
 	// Filtering
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	// Wrapping
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	SOIL_free_image_data(data);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -107,7 +115,9 @@ void LoadTexture() {
 
 void display(int width, int height) {
 	static MyShader blockShader("./Shaders/Block.vert", "./Shaders/Block.frag");
-	
+	static float time = 0.0f;
+	time += 0.016f;
+
 	if (!worldInitialized) {
 		CreateExampleWorld();
 		worldInitialized = true;
@@ -120,8 +130,8 @@ void display(int width, int height) {
 	//glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 10.0f); 
 	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); 
 
-	glm::vec3 cameraPos = glm::vec3(0.0f, 25.0f, 40.0f);
-	//glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 20.0f);
+	glm::vec3 cameraPos = glm::vec3(0.0f, 15.0f, 40.0f);
+	//glm::vec3 cameraPos = glm::vec3(10.0f, 5.0f, 20.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, -5.0f, 0.0f); 
 	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -147,6 +157,7 @@ void display(int width, int height) {
 	glBindTexture(GL_TEXTURE_2D, gStoneTex);
 	blockShader.setInt("uDiffuseTex", 0);
 	blockShader.setVec3("uLightDir", glm::vec3(-1.0f, -1.0f, -0.3f));
+	blockShader.setFloat("uTime", time);
 
 	chunkManager.renderAll();
 

@@ -45,6 +45,12 @@ struct Vertex {
 		position(pos), normal(n), uv(uv) {}
 };
 
+// Tile uv in atlas
+struct TileIndex {
+	int cx;
+	int cy;
+};
+
 class Chunk {
 public:
 	ChunkPos pos;
@@ -84,7 +90,8 @@ public:
 
 	//mesh
 	void buildMesh(); // generate vertices/indices and upload to GPU
-	void addFace(int wx, int wy, int wz, FaceDir dir); // world block position + dir
+	TileIndex getTileIndex(BlockType type, FaceDir dir); // generate uv
+	void addFace(int wx, int wy, int wz, FaceDir dir, BlockType type); // world block position + dir
 
 	bool isAirLocal(int lx, int ly, int lz) const; // whether need to be drawn
 

@@ -1,4 +1,5 @@
 #include "Chunk.h"
+#include <iostream>
 
 
 void Chunk::setBlock(int lx, int ly, int lz, BlockType type) {
@@ -19,7 +20,36 @@ bool Chunk::isAirLocal(int lx, int ly, int lz) const {
 	return blocks[index(lx, ly, lz)].type == BlockType::Air;
 }
 
-void Chunk::addFace(int wx, int wy, int wz, FaceDir dir) {
+TileIndex Chunk::getTileIndex(BlockType type, FaceDir dir) {
+	switch (type) {
+	case BlockType::Stone:
+		return { 0, 0 };
+	case BlockType::StoneBricks:
+		return { 1, 0 }; // stone_bricks
+
+	case BlockType::Water:
+		return { 2, 0 }; // water_still frame
+
+	case BlockType::Dirt:
+		return { 2, 1 }; // dirt
+
+	case BlockType::Sand:
+		return { 3, 1 }; // sand
+
+	case BlockType::Grass:
+		if (dir == FaceDir::PosY)       // top grass_top
+			return { 0, 1 };            
+		if (dir == FaceDir::NegY)      // bottom dirt
+			return { 2, 1 };             
+		
+		return { 1, 1 };                 // grass_side
+
+	default:
+		return { 0, 0 };                 // fallback: stone
+	}
+}
+
+void Chunk::addFace(int wx, int wy, int wz, FaceDir dir, BlockType type) {
 	glm::vec3 base(wx, wy, wz);
 
 	std::array<glm::vec3, 4> faceVerts;
@@ -87,12 +117,104 @@ void Chunk::addFace(int wx, int wy, int wz, FaceDir dir) {
 	}
 
 	// uv
-	std::array<glm::vec2, 4> faceUV = {
-		glm::vec2(0.0f, 0.0f),
-		glm::vec2(0.0f, 1.0f),
-		glm::vec2(1.0f, 1.0f),
-		glm::vec2(1.0f, 0.0f),
-	};
+	TileIndex tile = getTileIndex(type, dir);
+	const float cellX = 1.0f / 4.0f;
+    float u0 = tile.cx * cellX;
+    float u1 = (tile.cx + 1) * cellX;
+	const float cellY = 1.0f / 2.0f;
+    float v0 = tile.cy * cellY;
+    float v1 = (tile.cy + 1) * cellY;
+	
+	const float eps = 0.001f;
+	u0 += eps; v0 += eps;
+	u1 -= eps; v1 -= eps;
+
+
+	/*std::array<glm::vec2, 4> faceUV = {
+		glm::vec2(u0, v1),
+		glm::vec2(u1, v1),
+		glm::vec2(u1, v0),
+		glm::vec2(u0, v0),
+	};*/
+	std::array<glm::vec2, 4> faceUV;
+	switch (dir) {
+	case FaceDir::PosX: // +X 
+		faceUV = {
+			glm::vec2(u1, v1), 
+			glm::vec2(u1, v0), 
+			glm::vec2(u0, v0), 
+			glm::vec2(u0, v1)  
+		};
+		break;
+
+	case FaceDir::NegX: // -X 
+		faceUV = {
+			glm::vec2(u0, v1),
+			glm::vec2(u0, v0),
+			glm::vec2(u1, v0),
+			glm::vec2(u1, v1)
+		};
+		break;
+
+	case FaceDir::PosY: // +Y
+		faceUV = {
+			glm::vec2(u0, v0),
+			glm::vec2(u1, v0),
+			glm::vec2(u1, v1),
+			glm::vec2(u0, v1)
+		};
+		break;
+
+	case FaceDir::NegY: // -Y
+		faceUV = {
+			glm::vec2(u0, v1),
+			glm::vec2(u1, v1),
+			glm::vec2(u1, v0),
+			glm::vec2(u0, v0)
+		};
+		break;
+
+	case FaceDir::PosZ: // +Z
+		faceUV = {
+			glm::vec2(u0, v1),
+			glm::vec2(u1, v1),
+			glm::vec2(u1, v0),
+			glm::vec2(u0, v0)
+		};
+		break;
+
+	case FaceDir::NegZ: // -Z
+		faceUV = {
+			glm::vec2(u0, v1),
+			glm::vec2(u1, v1),
+			glm::vec2(u1, v0),
+			glm::vec2(u0, v0)
+		};
+		break;
+	}
+	static int debug1 = 0;
+	if (debug1 <= 10 && type == BlockType::Grass) {
+		std::cout << "================================Grass======================" << std::endl;
+		std::cout << faceUV[0].x << " " << faceUV[0].y << std::endl;
+		std::cout << faceUV[1].x << " " << faceUV[1].y << std::endl;
+		std::cout << faceUV[2].x << " " << faceUV[2].y << std::endl;
+		std::cout << faceUV[3].x << " " << faceUV[3].y << std::endl;
+		std::cout << "======================================================" << std::endl;
+		debug1++;
+	}
+
+	static int debug2 = 0;
+	if (debug2 <= 10 && type == BlockType::Dirt) {
+		std::cout << "==============================Dirt======================" << std::endl;
+		std::cout << faceUV[0].x << " " << faceUV[0].y << std::endl;
+		std::cout << faceUV[1].x << " " << faceUV[1].y << std::endl;
+		std::cout << faceUV[2].x << " " << faceUV[2].y << std::endl;
+		std::cout << faceUV[3].x << " " << faceUV[3].y << std::endl;
+		std::cout << "======================================================" << std::endl;
+		debug2++;
+	}
+	
+
 
 	unsigned int startIndex = static_cast<unsigned int>(vertices.size());
 
@@ -127,13 +249,16 @@ void Chunk::buildMesh() {
 				int wy = pos.y * CHUNK_SIZE_Y + ly;
 				int wz = pos.z * CHUNK_SIZE_Z + lz;
 
+				//static int debugCount = 0;
+				
+
 				// check whether around is air
-				if (isAirLocal(lx + 1, ly, lz)) addFace(wx, wy, wz, FaceDir::PosX);
-				if (isAirLocal(lx - 1, ly, lz)) addFace(wx, wy, wz, FaceDir::NegX);
-				if (isAirLocal(lx, ly + 1, lz)) addFace(wx, wy, wz, FaceDir::PosY);
-				if (isAirLocal(lx, ly - 1, lz)) addFace(wx, wy, wz, FaceDir::NegY);
-				if (isAirLocal(lx, ly, lz + 1)) addFace(wx, wy, wz, FaceDir::PosZ);
-				if (isAirLocal(lx, ly, lz - 1)) addFace(wx, wy, wz, FaceDir::NegZ);
+				if (isAirLocal(lx + 1, ly, lz)) addFace(wx, wy, wz, FaceDir::PosX, b.type);
+				if (isAirLocal(lx - 1, ly, lz)) addFace(wx, wy, wz, FaceDir::NegX, b.type);
+				if (isAirLocal(lx, ly + 1, lz)) addFace(wx, wy, wz, FaceDir::PosY, b.type);
+				if (isAirLocal(lx, ly - 1, lz)) addFace(wx, wy, wz, FaceDir::NegY, b.type);
+				if (isAirLocal(lx, ly, lz + 1)) addFace(wx, wy, wz, FaceDir::PosZ, b.type);
+				if (isAirLocal(lx, ly, lz - 1)) addFace(wx, wy, wz, FaceDir::NegZ, b.type);
 			}
 		}
 	}
