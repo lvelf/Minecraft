@@ -146,6 +146,8 @@ void display(int width, int height) {
 	float farPlane = 100.0f;
 	glm::mat4 projection = glm::perspective(fov, aspect, nearPlane, farPlane);
 
+	// Sun
+	glm::vec3 sunDir = glm::normalize(glm::vec3(-1.0f, -1.0f, -0.3f));
 	
 
 	blockShader.Use();
@@ -156,7 +158,7 @@ void display(int width, int height) {
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, gStoneTex);
 	blockShader.setInt("uDiffuseTex", 0);
-	blockShader.setVec3("uLightDir", glm::vec3(-1.0f, -1.0f, -0.3f));
+	blockShader.setVec3("uLightDir", sunDir);
 	blockShader.setFloat("uTime", time);
 
 	chunkManager.renderAll();
