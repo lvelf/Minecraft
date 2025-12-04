@@ -128,6 +128,7 @@
     <ClCompile Include="Chunk\Chunk.cpp" />
     <ClCompile Include="Chunk\ChunkManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Sky\Sky.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callbacks.h" />
@@ -136,10 +137,13 @@
     <ClInclude Include="Chunk\Chunk.h" />
     <ClInclude Include="Chunk\ChunkManager.h" />
     <ClInclude Include="MyShader.h" />
+    <ClInclude Include="Sky\Sky.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Block.frag" />
     <None Include="Shaders\Block.vert" />
+    <None Include="Shaders\Sky.frag" />
+    <None Include="Shaders\Sky.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

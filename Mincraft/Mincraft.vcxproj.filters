@@ -22,6 +22,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{18cc81ec-97b4-4bac-974b-d66ccd0610de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sky">
+      <UniqueIdentifier>{ae3568b9-f6b5-422b-a8be-289ab9180a8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -38,6 +41,9 @@
     </ClCompile>
     <ClCompile Include="Chunk\ChunkManager.cpp">
       <Filter>Chunk</Filter>
+    </ClCompile>
+    <ClCompile Include="Sky\Sky.cpp">
+      <Filter>Sky</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -59,12 +65,21 @@
     <ClInclude Include="MyShader.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="Sky\Sky.h">
+      <Filter>Sky</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Block.frag">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\Block.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Sky.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Sky.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

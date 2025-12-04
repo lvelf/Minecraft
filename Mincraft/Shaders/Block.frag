@@ -9,6 +9,7 @@ flat in int vMaterial;
 
 uniform sampler2D uDiffuseTex;
 uniform sampler2D uNormalMap;
+uniform samplerCube uCubeMap;
 uniform vec3 uLightDir; 
 uniform float uTime;
 uniform vec3 uCameraPos;
@@ -144,12 +145,17 @@ void main() {
            + specular * albedo;
 
 
+    
+
+    // water
+    bool isWater = (uv.x >= waterMin.x && uv.x <= waterMax.x &&
+        uv.y >= waterMin.y && uv.y <= waterMax.y);
+
     color = pow(color, vec3(1.0/2.2));
     FragColor = vec4(color, 1.0);
 
     // water
-    if (uv.x >= waterMin.x && uv.x <= waterMax.x &&
-        uv.y >= waterMin.y && uv.y <= waterMax.y) {
+    if (isWater) {
         color *= vec3(0.6, 0.8, 1.2);
         FragColor = vec4(color, 0.7);
     }
