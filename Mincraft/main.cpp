@@ -14,14 +14,16 @@
 #include "MyShader.h"
 #include "Sky/Sky.h"
 #include <stb_image.h>
-
+#include "World/WorldManager.h"
 
 int windowLength = 1600;
 int windowHeight = 1600;
 
 static ChunkManager chunkManager;
+static std::unique_ptr<WorldManager> worldManager;
 static bool worldInitialized = false;
 void CreateExampleWorld();
+void CreateWorld();
 void LoadTexture();
 
 // Texture
@@ -33,6 +35,10 @@ static Sky* sky;
 
 // Camera
 
+// World
+int worldRadius = 20;
+int worldHeight = 20;
+
 
 
 void Init() {
@@ -40,7 +46,10 @@ void Init() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	LoadTexture();
-	CreateExampleWorld();
+	//CreateExampleWorld();
+	
+	worldManager = std::make_unique<WorldManager>(worldRadius, worldHeight);
+	CreateWorld();
 	sky = new Sky();
 	worldInitialized = true;
 }
@@ -86,6 +95,10 @@ void CreateExampleWorld() {
 			chunkManager.setBlockWorld(x, -1 + height, z, BlockType::Grass);
 		}
 	}
+}
+
+void CreateWorld() {
+	worldManager->generateInitialWolrd();
 }
 
 
@@ -281,7 +294,7 @@ void display(int width, int height) {
 	//glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 10.0f); 
 	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); 
 
-	glm::vec3 cameraPos = glm::vec3(0.0f, 15.0f, 40.0f);
+	glm::vec3 cameraPos = glm::vec3(0.0f, 75.0f, 70.0f);
 	//glm::vec3 cameraPos = glm::vec3(10.0f, 5.0f, 20.0f);
 	glm::vec3 cameraTarget = glm::vec3(0.0f, -5.0f, 0.0f); 
 	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -347,8 +360,8 @@ void display(int width, int height) {
 	blockShader.setFloat("uTime", time);
 	blockShader.setVec3("uCameraPos", cameraPos);
 
-	chunkManager.renderAll();
-
+	//chunkManager.renderAll();
+	worldManager->render();
 }
 
 int main() {

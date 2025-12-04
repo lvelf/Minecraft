@@ -25,6 +25,9 @@
     <Filter Include="Sky">
       <UniqueIdentifier>{ae3568b9-f6b5-422b-a8be-289ab9180a8c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="World">
+      <UniqueIdentifier>{bb18ce70-d19f-4924-8dfa-b11c3d351ae8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -44,6 +47,12 @@
     </ClCompile>
     <ClCompile Include="Sky\Sky.cpp">
       <Filter>Sky</Filter>
+    </ClCompile>
+    <ClCompile Include="World\TerrainGenerator.cpp">
+      <Filter>World</Filter>
+    </ClCompile>
+    <ClCompile Include="World\WorldManager.cpp">
+      <Filter>World</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +76,12 @@
     </ClInclude>
     <ClInclude Include="Sky\Sky.h">
       <Filter>Sky</Filter>
+    </ClInclude>
+    <ClInclude Include="World\TerrainGenerator.h">
+      <Filter>World</Filter>
+    </ClInclude>
+    <ClInclude Include="World\WorldManager.h">
+      <Filter>World</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
