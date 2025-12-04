@@ -157,6 +157,22 @@ void main() {
     // water
     if (isWater) {
         color *= vec3(0.6, 0.8, 1.2);
+        // wave
+        float wave1 = sin(vWorldPos.x * 2.0 + uTime * 2.0) * 0.15;
+        float wave2 = sin(vWorldPos.z * 1.5 - uTime * 1.5) * 0.15;
+        vec3 waveNormal = norm;
+        waveNormal.x += wave1;
+        waveNormal.x += wave2;
+        waveNormal = normalize(waveNormal);
+
+        // env map
+        vec3 reflectDir = reflect(viewDir, waveNormal);
+        vec3 reflection = texture(uCubeMap, reflectDir).rgb;
+
+        float fresnel = pow(1.0 - max(dot(-viewDir, norm), 0.0), 3.0);
+
+        color = mix(color, reflection, fresnel * 0.4);
+
         FragColor = vec4(color, 0.7);
     }
 }
