@@ -36,7 +36,7 @@ static Sky* sky;
 // Camera
 
 // World
-int worldRadius = 20;
+int worldRadius = 30;
 int worldHeight = 20;
 
 

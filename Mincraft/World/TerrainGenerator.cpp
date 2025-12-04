@@ -1,10 +1,8 @@
 #include "TerrainGenerator.h"
 
 int TerrainGenerator::getHeight(int wx, int wz) const {
-	float x = wx * params.frequency;
-	float z = wz * params.frequency;
-
-	float h = std::sin(x) + std::cos(z * 0.5f);
+	
+	float h = noise.GetNoise((float)wx, (float)wz);
 	h = (h * 0.5f + 0.5f);
 
 	int height = (int)(params.baseHeight + h * params.amplitude);

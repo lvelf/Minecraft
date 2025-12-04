@@ -140,6 +140,7 @@
     <ClInclude Include="Chunk\ChunkManager.h" />
     <ClInclude Include="MyShader.h" />
     <ClInclude Include="Sky\Sky.h" />
+    <ClInclude Include="World\FastNoiseLite.h" />
     <ClInclude Include="World\TerrainGenerator.h" />
     <ClInclude Include="World\WorldManager.h" />
   </ItemGroup>

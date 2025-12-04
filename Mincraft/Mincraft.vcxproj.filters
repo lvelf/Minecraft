@@ -83,6 +83,9 @@
     <ClInclude Include="World\WorldManager.h">
       <Filter>World</Filter>
     </ClInclude>
+    <ClInclude Include="World\FastNoiseLite.h">
+      <Filter>World</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Block.frag">
