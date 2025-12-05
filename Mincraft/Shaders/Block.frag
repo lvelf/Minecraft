@@ -103,7 +103,11 @@ void main() {
 
     NoH = clamp(NoH, 0.05, 1.0);
 
-    vec3 albedo = texture(uDiffuseTex, uv).rgb;
+    //vec3 albedo = texture(uDiffuseTex, uv, 0.5).rgb; // add bias to avoid jag
+    // bias
+    float dist = length(vWorldPos - uCameraPos);
+    float bias = clamp((dist - 20.0) / 60.0, 0.0, 1.5);
+    vec3 albedo = texture(uDiffuseTex, uv, bias).rgb;
     albedo = pow(albedo, vec3(2.2)); // albeo
 
     vec3 ambient = vec3(0.3);
@@ -144,7 +148,13 @@ void main() {
     vec3 color = albedo * (ambient + diffuse)
            + specular * albedo;
 
+    // fog 
+    float fogStart = 80.0;
+    float fogEnd = 220.0f;
 
+    float fog = clamp((dist - fogStart) / (fogEnd - fogStart), 0.0, 1.0f);
+    vec3 fogColor = vec3(0.8, 0.75, 0.72);
+    color = mix(color, fogColor, fog);
     
 
     // water
@@ -175,4 +185,6 @@ void main() {
 
         FragColor = vec4(color, 0.7);
     }
+
+    
 }

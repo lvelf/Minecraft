@@ -56,7 +56,7 @@ TileIndex Chunk::getTileIndex(BlockType type, FaceDir dir) {
 	}
 }
 
-void Chunk::addFace(int wx, int wy, int wz, FaceDir dir, BlockType type) {
+void Chunk::addFace(int wx, int wy, int wz, FaceDir dir, BlockType type, std::vector<Vertex>& verts, std::vector<unsigned int>& idx) {
 	glm::vec3 base(wx, wy, wz);
 
 	std::array<glm::vec3, 4> faceVerts;
@@ -254,19 +254,25 @@ void Chunk::addFace(int wx, int wy, int wz, FaceDir dir, BlockType type) {
 	}
 
 
-	unsigned int startIndex = static_cast<unsigned int>(vertices.size());
+	unsigned int startIndex = static_cast<unsigned int>(verts.size());
 
 	for (int i = 0; i < 4; i++) {
-		vertices.push_back(Vertex{ faceVerts[i], normal, faceUV[i], tangent, bitangent, mat});
+		verts.push_back(Vertex{ faceVerts[i], normal, faceUV[i], tangent, bitangent, mat});
 	}
 
 	// 2 triangles 
-	indices.push_back(startIndex + 0);
+	/*indices.push_back(startIndex + 0);
 	indices.push_back(startIndex + 1);
 	indices.push_back(startIndex + 2);
 	indices.push_back(startIndex + 0);
 	indices.push_back(startIndex + 2);
-	indices.push_back(startIndex + 3);
+	indices.push_back(startIndex + 3);*/
+	idx.push_back(startIndex + 0);
+	idx.push_back(startIndex + 1);
+	idx.push_back(startIndex + 2);
+	idx.push_back(startIndex + 0);
+	idx.push_back(startIndex + 2);
+	idx.push_back(startIndex + 3);
 
 }
 
@@ -274,6 +280,11 @@ void Chunk::buildMesh(ChunkManager& chunkManager) {
 
 	vertices.clear();
 	indices.clear();
+
+	std::vector<Vertex> opaqueVerts;
+	std::vector<unsigned int> opaqueIdx;
+	std::vector<Vertex> waterVerts;
+	std::vector<unsigned int> waterIdx;
 
 	for (int ly = 0; ly < CHUNK_SIZE_Y; ++ly) {
 		for (int lz = 0; lz < CHUNK_SIZE_Z; ++lz) {
@@ -288,7 +299,7 @@ void Chunk::buildMesh(ChunkManager& chunkManager) {
 				int wz = pos.z * CHUNK_SIZE_Z + lz;
 
 				//static int debugCount = 0;
-				
+
 
 				// check whether around is air
 				/*
@@ -299,28 +310,37 @@ void Chunk::buildMesh(ChunkManager& chunkManager) {
 				if (isAirLocal(lx, ly, lz + 1, chunkManager)) addFace(wx, wy, wz, FaceDir::PosZ, b.type);
 				if (isAirLocal(lx, ly, lz - 1, chunkManager)) addFace(wx, wy, wz, FaceDir::NegZ, b.type);*/
 				if (b.type != BlockType::Water) {
-					addFace(wx, wy, wz, FaceDir::PosX, b.type);
-					addFace(wx, wy, wz, FaceDir::NegX, b.type);
-					addFace(wx, wy, wz, FaceDir::PosY, b.type);
-					addFace(wx, wy, wz, FaceDir::NegY, b.type);
-					addFace(wx, wy, wz, FaceDir::PosZ, b.type);
-					addFace(wx, wy, wz, FaceDir::NegZ, b.type);
+					addFace(wx, wy, wz, FaceDir::PosX, b.type, opaqueVerts, opaqueIdx);
+					addFace(wx, wy, wz, FaceDir::NegX, b.type, opaqueVerts, opaqueIdx);
+					addFace(wx, wy, wz, FaceDir::PosY, b.type, opaqueVerts, opaqueIdx);
+					addFace(wx, wy, wz, FaceDir::NegY, b.type, opaqueVerts, opaqueIdx);
+					addFace(wx, wy, wz, FaceDir::PosZ, b.type, opaqueVerts, opaqueIdx);
+					addFace(wx, wy, wz, FaceDir::NegZ, b.type, opaqueVerts, opaqueIdx);
 				}
 
 				if (b.type == BlockType::Water) {
-					if (isAirLocal(lx + 1, ly, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::PosX, b.type);
-					if (isAirLocal(lx - 1, ly, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::NegX, b.type);
-					if (isAirLocal(lx, ly + 1, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::PosY, b.type);
-					if (isAirLocal(lx, ly - 1, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::NegY, b.type);
-					if (isAirLocal(lx, ly, lz + 1, chunkManager)) addFace(wx, wy, wz, FaceDir::PosZ, b.type);
-					if (isAirLocal(lx, ly, lz - 1, chunkManager)) addFace(wx, wy, wz, FaceDir::NegZ, b.type);
+					if (isAirLocal(lx + 1, ly, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::PosX, b.type, waterVerts, waterIdx);
+					if (isAirLocal(lx - 1, ly, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::NegX, b.type, waterVerts, waterIdx);
+					if (isAirLocal(lx, ly + 1, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::PosY, b.type, waterVerts, waterIdx);
+					if (isAirLocal(lx, ly - 1, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::NegY, b.type, waterVerts, waterIdx);
+					if (isAirLocal(lx, ly, lz + 1, chunkManager)) addFace(wx, wy, wz, FaceDir::PosZ, b.type, waterVerts, waterIdx);
+					if (isAirLocal(lx, ly, lz - 1, chunkManager)) addFace(wx, wy, wz, FaceDir::NegZ, b.type, waterVerts, waterIdx);
 				}
-				
+			
 			}
 		}
 	}
 
+	// put water in the last
+	vertices = std::move(opaqueVerts);
+	indices = std::move(opaqueIdx);
 
+	unsigned int base = static_cast<unsigned int>(vertices.size());
+
+	vertices.insert(vertices.end(), waterVerts.begin(), waterVerts.end());
+	for (unsigned i : waterIdx) {
+		indices.push_back(base + i);
+	}
 	// load vertices and indices to GPU(VBO/EBO)
 	
 	// generate VAO VBO EBO

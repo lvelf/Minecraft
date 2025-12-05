@@ -98,7 +98,7 @@ public:
 	//mesh
 	void buildMesh(ChunkManager& chunkManager); // generate vertices/indices and upload to GPU
 	TileIndex getTileIndex(BlockType type, FaceDir dir); // generate uv
-	void addFace(int wx, int wy, int wz, FaceDir dir, BlockType type); // world block position + dir
+	void addFace(int wx, int wy, int wz, FaceDir dir, BlockType type, std::vector<Vertex>& verts, std::vector<unsigned int>& idx); // world block position + dir
 
 	bool isAirLocal(int lx, int ly, int lz, ChunkManager& chunkManager) const; // whether need to be drawn
 
