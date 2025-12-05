@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <string>
 
 enum class BlockType : uint8_t {
 	Air = 0,
@@ -26,4 +27,6 @@ struct Block {
 
 	Block(BlockType type) : type(type) {}
 };
+
+std::string blockName(Block block);
 

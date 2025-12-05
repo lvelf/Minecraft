@@ -125,9 +125,11 @@
   <ItemGroup>
     <ClCompile Include="callbacks.cpp" />
     <ClCompile Include="Camera\Camera.cpp" />
+    <ClCompile Include="Chunk\Block.cpp" />
     <ClCompile Include="Chunk\Chunk.cpp" />
     <ClCompile Include="Chunk\ChunkManager.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player\Player.cpp" />
     <ClCompile Include="Sky\Sky.cpp" />
     <ClCompile Include="World\TerrainGenerator.cpp" />
     <ClCompile Include="World\WorldManager.cpp" />
@@ -139,6 +141,7 @@
     <ClInclude Include="Chunk\Chunk.h" />
     <ClInclude Include="Chunk\ChunkManager.h" />
     <ClInclude Include="MyShader.h" />
+    <ClInclude Include="Player\Player.h" />
     <ClInclude Include="Sky\Sky.h" />
     <ClInclude Include="World\FastNoiseLite.h" />
     <ClInclude Include="World\TerrainGenerator.h" />

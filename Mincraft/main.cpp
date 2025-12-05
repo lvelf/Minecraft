@@ -15,6 +15,7 @@
 #include "Sky/Sky.h"
 #include <stb_image.h>
 #include "World/WorldManager.h"
+#include "Player/Player.h"
 
 int windowLength = 1600;
 int windowHeight = 1600;
@@ -36,8 +37,19 @@ static Sky* sky;
 // Camera
 
 // World
-int worldRadius = 30;
+int worldRadius = 100;
 int worldHeight = 20;
+
+//window
+GLFWwindow* window;
+
+//Player 
+static std::unique_ptr<Player> player;
+static float lastFrameTime = 0.0f;
+static bool firstMouse = true;
+static float lastMouseX = 800.0f;
+static float lastMouseY = 600.0f;
+static AppState appState;
 
 
 
@@ -51,6 +63,9 @@ void Init() {
 	worldManager = std::make_unique<WorldManager>(worldRadius, worldHeight);
 	CreateWorld();
 	sky = new Sky();
+
+	player = std::make_unique<Player>(glm::vec3(0.0f, 0.0f, 0.0f));
+	appState.player = player.get();
 	worldInitialized = true;
 }
 
@@ -276,34 +291,51 @@ void LoadTexture() {
 
 
 
+
 void display(int width, int height) {
 	static MyShader blockShader("./Shaders/Block.vert", "./Shaders/Block.frag");
 	static MyShader gSkyShader("./Shaders/Sky.vert", "./Shaders/Sky.frag");
+
+	// delta time
+	static float lastFrameTime = 0.0f;
+	float currentTime = glfwGetTime();
+	float deltaTime = currentTime - lastFrameTime;
+	lastFrameTime = currentTime;
+
 	static float time = 0.0f;
-	time += 0.016f;
+	time += deltaTime;
+
 
 	if (!worldInitialized) {
 		CreateExampleWorld();
 		worldInitialized = true;
 	}
 
+	if (player) {
+		player->processInput(window, deltaTime, worldManager->getChunkManager());
+		player->update(deltaTime, worldManager->getChunkManager());
+	}
+
 	glClearColor(0.1f, 0.1f, 0.2f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	
 
 	//default setting for camera
 	//glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, 10.0f); 
 	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f); 
 
-	glm::vec3 cameraPos = glm::vec3(0.0f, 75.0f, 70.0f);
-	//glm::vec3 cameraPos = glm::vec3(10.0f, 5.0f, 20.0f);
-	glm::vec3 cameraTarget = glm::vec3(0.0f, -5.0f, 0.0f); 
+	//glm::vec3 cameraPos = glm::vec3(0.0f, 100.0f, 70.0f);
+	//glm::vec3 cameraPos = glm::vec3(0.0f, 15.0f, 20.0f);
+	//glm::vec3 cameraTarget = glm::vec3(0.0f, -5.0f, 0.0f); 
 	//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f); 
-
-	glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
+	// glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 cameraPos = player->getCameraPosition();
+	//glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
 	// camera 
-	//glm::mat4 view = camera.GetViewMatrix();
+	glm::mat4 view = player->getViewMatrix();
+
 	// projection
 	float fov = glm::radians(60.0f);
 	//float fov = glm::radians(camera.Zoom);
@@ -377,12 +409,15 @@ int main() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// create a window
-	GLFWwindow* window = glfwCreateWindow(windowLength, windowHeight, "Minecraft", nullptr, nullptr);
+	window = glfwCreateWindow(windowLength, windowHeight, "Minecraft", nullptr, nullptr);
 	if (window == nullptr) {
 		std::cout << "Could not create the window" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
+
+	// bind appData to window
+	glfwSetWindowUserPointer(window, &appState);
 
 	// make context
 	glfwMakeContextCurrent(window);
@@ -394,7 +429,7 @@ int main() {
 	
 	// set input mode
 	// ------------------------------------------
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Init GLEW
 	// ------------------------------------

@@ -13,6 +13,10 @@ public:
 
 	void render();
 
+	ChunkManager& getChunkManager() {
+		return chunkManager;
+	}
+
 private:
 	int renderRaius;
 	
