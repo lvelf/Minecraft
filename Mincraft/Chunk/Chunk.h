@@ -8,6 +8,8 @@
 #include <array>
 #include <cstddef>
 
+class ChunkManager;
+
 const int CHUNK_SIZE_X = 16;
 const int CHUNK_SIZE_Y = 16;
 const int CHUNK_SIZE_Z = 16;
@@ -94,11 +96,11 @@ public:
 	std::vector<unsigned int> indices;
 
 	//mesh
-	void buildMesh(); // generate vertices/indices and upload to GPU
+	void buildMesh(ChunkManager& chunkManager); // generate vertices/indices and upload to GPU
 	TileIndex getTileIndex(BlockType type, FaceDir dir); // generate uv
 	void addFace(int wx, int wy, int wz, FaceDir dir, BlockType type); // world block position + dir
 
-	bool isAirLocal(int lx, int ly, int lz) const; // whether need to be drawn
+	bool isAirLocal(int lx, int ly, int lz, ChunkManager& chunkManager) const; // whether need to be drawn
 
 	void render(); // bind VAO + Draw
 };

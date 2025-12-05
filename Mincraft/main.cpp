@@ -114,6 +114,7 @@ void CreateExampleWorld() {
 
 void CreateWorld() {
 	worldManager->generateInitialWolrd();
+	//worldManager->createExampleWorld();
 }
 
 

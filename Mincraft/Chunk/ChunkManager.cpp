@@ -83,7 +83,7 @@ void ChunkManager::renderAll() {
         Chunk* chunk = kv.second.get();
 
         if (chunk->dirty) {
-            chunk->buildMesh();
+            chunk->buildMesh(*this);
         }
 
         chunk->render();

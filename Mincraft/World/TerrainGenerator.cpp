@@ -50,6 +50,10 @@ BlockType TerrainGenerator::chooseBlock(int wx, int wy, int wz, int groundY) con
         return BlockType::Air;
     }
 
+    if (groundY == wy) {
+        if (groundY <= waterLevel + 1) return BlockType::Sand;
+        return BlockType::Grass;
+    }
     
     if (groundY - wy >= caveMinDepth) {
         if (isCave(wx, wy, wz)) {

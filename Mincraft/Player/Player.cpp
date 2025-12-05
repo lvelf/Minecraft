@@ -21,11 +21,16 @@ glm::vec3 Player::getRight() const {
 
 bool Player::isOnGround(ChunkManager& chunkManager) {
 	int px = (int)std::floor(position.x);
-	int py = (int)std::floor(position.y - 0.1f);
+	int pyBelow = (int)std::floor(position.y - 0.1f);
 	int pz = (int)std::floor(position.z);
 
-	Block block = chunkManager.getBlockWorld(px, py, pz);
-	std::cout << "now your bottom block is:" << blockName(block) << std::endl;
+
+	Block block = chunkManager.getBlockWorld(px, pyBelow, pz);
+	
+	//std::cout << "now your bottom block is:" << blockName(block) << std::endl;
+
+	
+
 	return (block.type != BlockType::Air && block.type != BlockType::Water);
 }
 

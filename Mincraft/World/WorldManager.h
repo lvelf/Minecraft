@@ -6,10 +6,12 @@
 class WorldManager {
 public:
 	WorldManager(int radiusChunks, int worldHeight) : radius(radiusChunks), worldHeight(worldHeight) {
-		generateInitialWolrd();
+		//generateInitialWolrd();
 	}
 
 	void generateInitialWolrd();
+
+	void createExampleWorld();
 
 	void render();
 

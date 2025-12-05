@@ -1,6 +1,6 @@
 #include "Chunk.h"
 #include <iostream>
-
+#include "ChunkManager.h"
 
 void Chunk::setBlock(int lx, int ly, int lz, BlockType type) {
 	if (blocks[index(lx, ly, lz)].type != type)
@@ -9,11 +9,18 @@ void Chunk::setBlock(int lx, int ly, int lz, BlockType type) {
 	blocks[index(lx, ly, lz)].type = type;
 }
 
-bool Chunk::isAirLocal(int lx, int ly, int lz) const {
+bool Chunk::isAirLocal(int lx, int ly, int lz, ChunkManager& chunkManager) const {
 	if (lx < 0 || lx >= CHUNK_SIZE_X ||
 		ly < 0 || ly >= CHUNK_SIZE_Y ||
 		lz < 0 || lz >= CHUNK_SIZE_Z) {
-		return true;
+		
+		int wx = pos.x * CHUNK_SIZE_X + lx;
+		int wy = pos.y * CHUNK_SIZE_Y + ly;
+		int wz = pos.z * CHUNK_SIZE_Z + lz;
+
+		Block neighbourBlock = chunkManager.getBlockWorld(wx, wy, wz);
+
+		return neighbourBlock.type == BlockType::Air;
 	}
 
 	// TODO: ChunkManager should manage this, since it need be across chunks
@@ -263,7 +270,7 @@ void Chunk::addFace(int wx, int wy, int wz, FaceDir dir, BlockType type) {
 
 }
 
-void Chunk::buildMesh() {
+void Chunk::buildMesh(ChunkManager& chunkManager) {
 
 	vertices.clear();
 	indices.clear();
@@ -284,12 +291,31 @@ void Chunk::buildMesh() {
 				
 
 				// check whether around is air
-				if (isAirLocal(lx + 1, ly, lz)) addFace(wx, wy, wz, FaceDir::PosX, b.type);
-				if (isAirLocal(lx - 1, ly, lz)) addFace(wx, wy, wz, FaceDir::NegX, b.type);
-				if (isAirLocal(lx, ly + 1, lz)) addFace(wx, wy, wz, FaceDir::PosY, b.type);
-				if (isAirLocal(lx, ly - 1, lz)) addFace(wx, wy, wz, FaceDir::NegY, b.type);
-				if (isAirLocal(lx, ly, lz + 1)) addFace(wx, wy, wz, FaceDir::PosZ, b.type);
-				if (isAirLocal(lx, ly, lz - 1)) addFace(wx, wy, wz, FaceDir::NegZ, b.type);
+				/*
+				if (isAirLocal(lx + 1, ly, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::PosX, b.type);
+				if (isAirLocal(lx - 1, ly, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::NegX, b.type);
+				if (isAirLocal(lx, ly + 1, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::PosY, b.type);
+				if (isAirLocal(lx, ly - 1, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::NegY, b.type);
+				if (isAirLocal(lx, ly, lz + 1, chunkManager)) addFace(wx, wy, wz, FaceDir::PosZ, b.type);
+				if (isAirLocal(lx, ly, lz - 1, chunkManager)) addFace(wx, wy, wz, FaceDir::NegZ, b.type);*/
+				if (b.type != BlockType::Water) {
+					addFace(wx, wy, wz, FaceDir::PosX, b.type);
+					addFace(wx, wy, wz, FaceDir::NegX, b.type);
+					addFace(wx, wy, wz, FaceDir::PosY, b.type);
+					addFace(wx, wy, wz, FaceDir::NegY, b.type);
+					addFace(wx, wy, wz, FaceDir::PosZ, b.type);
+					addFace(wx, wy, wz, FaceDir::NegZ, b.type);
+				}
+
+				if (b.type == BlockType::Water) {
+					if (isAirLocal(lx + 1, ly, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::PosX, b.type);
+					if (isAirLocal(lx - 1, ly, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::NegX, b.type);
+					if (isAirLocal(lx, ly + 1, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::PosY, b.type);
+					if (isAirLocal(lx, ly - 1, lz, chunkManager)) addFace(wx, wy, wz, FaceDir::NegY, b.type);
+					if (isAirLocal(lx, ly, lz + 1, chunkManager)) addFace(wx, wy, wz, FaceDir::PosZ, b.type);
+					if (isAirLocal(lx, ly, lz - 1, chunkManager)) addFace(wx, wy, wz, FaceDir::NegZ, b.type);
+				}
+				
 			}
 		}
 	}
