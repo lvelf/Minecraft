@@ -46,6 +46,17 @@ void getMaterialParams(int matID, out float roughness, out float F0_base) {
     }
 }
 
+float gaussianNoise(vec2 coord) {
+    float sum = 0.0;
+    
+    for (int i = 0; i < 6; i++) {
+        vec2 offset = vec2(float(i), float(i * 2));
+        sum += fract(sin(dot(coord + offset, vec2(12.9898, 78.233))) * 43758.5453);
+    }
+    
+    return (sum / 6.0) - 0.5;
+}
+
 
 void main() {
     vec2 uv = vUV;
@@ -104,10 +115,24 @@ void main() {
     NoH = clamp(NoH, 0.05, 1.0);
 
     //vec3 albedo = texture(uDiffuseTex, uv, 0.5).rgb; // add bias to avoid jag
+
+    // noise 
     // bias
     float dist = length(vWorldPos - uCameraPos);
-    float bias = clamp((dist - 20.0) / 60.0, 0.0, 1.5);
-    vec3 albedo = texture(uDiffuseTex, uv, bias).rgb;
+    float base_bias = clamp((dist - 20.0) / 60.0, 0.0, 1.5);
+    //vec2 noiseCoord = vWorldPos.xz * 0.1;
+    vec2 noiseCoord = vUV * 20.0;
+    float noise = gaussianNoise(noiseCoord);
+    float ditherRange = 0.5;
+    float final_bias;
+    if (dist > 15.0f && vMaterial == 5) {
+        final_bias = base_bias + noise * ditherRange;        
+    } else {
+        final_bias = base_bias;
+    }
+
+    final_bias = clamp(final_bias, 0.0, 3.0);
+    vec3 albedo = texture(uDiffuseTex, uv, base_bias).rgb;
     albedo = pow(albedo, vec3(2.2)); // albeo
 
     vec3 ambient = vec3(0.3);
@@ -147,7 +172,7 @@ void main() {
 
     vec3 color = albedo * (ambient + diffuse)
            + specular * albedo;
-
+    color = pow(color, vec3(1.0/2.2));
     // fog 
     float fogStart = 80.0;
     float fogEnd = 220.0f;
@@ -161,7 +186,7 @@ void main() {
     bool isWater = (uv.x >= waterMin.x && uv.x <= waterMax.x &&
         uv.y >= waterMin.y && uv.y <= waterMax.y);
 
-    color = pow(color, vec3(1.0/2.2));
+    
     FragColor = vec4(color, 1.0);
 
     // water
