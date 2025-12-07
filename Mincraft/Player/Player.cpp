@@ -105,6 +105,30 @@ void Player::processInput(GLFWwindow* window, float deltaTime, ChunkManager& chu
 		
 	}
 
+	// dig block
+	HitInfo currentHit = raycastBlock(getCameraPosition(), getForward(), 6.0f, chunkManager);
+
+	int leftState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+	int rightState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+
+	if (rightState == GLFW_PRESS) {
+		std::cout << "current hit status: " << "hit - " << currentHit.hit << "hit place: " << currentHit.placePos.x << " " << currentHit.placePos.y << " " << currentHit.placePos.z << " Block Type is:" <<  blockName(Block(currentHit.type) ) << std::endl;
+
+		if (!prevRightPressed) {
+			if (hasHeldBlock && currentHit.hit) {
+				glm::ivec3 p = currentHit.placePos;
+				Block b = chunkManager.getBlockWorld(p.x, p.y, p.z);
+				if (b.type == BlockType::Air) {
+					chunkManager.setBlockWorld(p.x, p.y, p.z, heldBlock);
+				}
+			}
+		}
+		prevRightPressed = true;
+	}
+	else {
+		prevRightPressed = false;
+	}
+
 }
 
 void Player::update(float deltaTime, ChunkManager& chunkManager) {
@@ -128,6 +152,8 @@ void Player::update(float deltaTime, ChunkManager& chunkManager) {
 		velocity.y = 0.0f;
 		isJumping = false;
 	}
+
+	
 }
 
 void Player::jump() {
@@ -135,4 +161,56 @@ void Player::jump() {
 		velocity.y = JUMP_VELOCITY;
 		isJumping = true;
 	}
+}
+
+
+HitInfo Player::raycastBlock(const glm::vec3& origin,
+	const glm::vec3& dir,
+	float maxDist,
+	ChunkManager& cm) {
+	
+	HitInfo info;
+	glm::vec3 pos = origin;
+	glm::vec3 step = glm::normalize(dir) * 0.1f;
+
+	float dist = 0.0f;
+	glm::ivec3 lastBlockPos((int)std::floor(origin.x),
+		(int)std::floor(origin.y),
+		(int)std::floor(origin.z));
+
+	while (dist < maxDist) {
+		pos += step;
+		dist += 0.1f;
+
+		glm::ivec3 bpos((int)std::floor(pos.x),
+			(int)std::floor(pos.y),
+			(int)std::floor(pos.z));
+
+		if (bpos != lastBlockPos) {
+			Block b = cm.getBlockWorld(bpos.x, bpos.y, bpos.z);
+			if (b.type != BlockType::Air) {
+				info.hit = true;
+				info.bx = bpos.x;
+				info.by = bpos.y;
+				info.bz = bpos.z;
+				info.type = b.type;
+
+				glm::vec3 diff = pos - glm::vec3(bpos) - glm::vec3(0.5f);
+				glm::ivec3 n(0);
+				if (std::abs(diff.x) > std::abs(diff.y) &&
+					std::abs(diff.x) > std::abs(diff.z))
+					n.x = (diff.x > 0) ? 1 : -1;
+				else if (std::abs(diff.y) > std::abs(diff.z))
+					n.y = (diff.y > 0) ? 1 : -1;
+				else
+					n.z = (diff.z > 0) ? 1 : -1;
+				info.hitNormal = n;
+				info.placePos = glm::ivec3(info.bx, info.by, info.bz) + n;
+				return info;
+			}
+			lastBlockPos = bpos;
+		}
+	}
+
+	return info;
 }

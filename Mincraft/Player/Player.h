@@ -2,12 +2,30 @@
 #include <glm/glm.hpp>
 #include "../Chunk/ChunkManager.h"
 
+struct HitInfo {
+	bool hit = false;
+	int bx = 0, by = 0, bz = 0;
+	glm::ivec3 placePos = glm::ivec3(0);
+	glm::ivec3 hitNormal = glm::ivec3(0);
+	BlockType type = BlockType::Air;
+};
+
 class Player {
 public:
 	Player(const glm::vec3& startPos) : position(startPos), velocity(0.0f) {
 		yaw = 0.0f;
 		pitch = -20.0f;
 	}
+
+	BlockType heldBlock = BlockType::Dirt;
+	bool prevRightPressed = false;
+	bool hasHeldBlock = true;
+
+	// dig 
+	float breakTime = 0.0f;
+	float breakNeeded = 0.6f;
+	glm::ivec3 breakingBlock;
+	bool isBreaking = false;
 
 	void update(float deltaTime, ChunkManager& chunkManager);
 	void processInput(GLFWwindow* window, float deltaTime, ChunkManager& chunkManager);
@@ -40,6 +58,11 @@ public:
 	}
 
 	void jump();
+
+	HitInfo raycastBlock(const glm::vec3& origin,
+						 const glm::vec3& dir,
+						 float maxDist,
+						 ChunkManager& cm);
 
 private:
 

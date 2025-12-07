@@ -74,6 +74,37 @@ void ChunkManager::setBlockWorld(int bx, int by, int bz, BlockType type) {
 
     Chunk* chunk = getOrCreateChunk(cpos);
     chunk->setBlock(lx, ly, lz, type);
+
+    auto  markDirty = [&](const ChunkPos& p) {
+        if (Chunk* c = getChunk(p)) {
+            c->dirty = true;
+        }
+    };
+
+    if (lx == 0) {
+        ChunkPos n = cpos; n.x -= 1;
+        markDirty(n);
+    }
+    if (lx == CHUNK_SIZE_X - 1) {
+        ChunkPos n = cpos; n.x += 1;
+        markDirty(n);
+    }
+    if (ly == 0) {
+        ChunkPos n = cpos; n.y -= 1;
+        markDirty(n);
+    }
+    if (ly == CHUNK_SIZE_Y - 1) {
+        ChunkPos n = cpos; n.y += 1;
+        markDirty(n);
+    }
+    if (lz == 0) {
+        ChunkPos n = cpos; n.z -= 1;
+        markDirty(n);
+    }
+    if (lz == CHUNK_SIZE_Z - 1) {
+        ChunkPos n = cpos; n.z += 1;
+        markDirty(n);
+    }
 }
 
 void ChunkManager::renderAll() {
