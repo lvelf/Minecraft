@@ -150,6 +150,8 @@
   <ItemGroup>
     <None Include="Shaders\Block.frag" />
     <None Include="Shaders\Block.vert" />
+    <None Include="Shaders\crosshair.frag" />
+    <None Include="Shaders\crosshair.vert" />
     <None Include="Shaders\Sky.frag" />
     <None Include="Shaders\Sky.vert" />
   </ItemGroup>

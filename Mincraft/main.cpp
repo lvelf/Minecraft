@@ -26,6 +26,7 @@ static bool worldInitialized = false;
 void CreateExampleWorld();
 void CreateWorld();
 void LoadTexture();
+void InitCrosshair();
 
 // Texture
 GLuint gStoneTex = 0;
@@ -51,6 +52,9 @@ static float lastMouseX = 800.0f;
 static float lastMouseY = 600.0f;
 static AppState appState;
 
+// crosshair
+GLuint crosshairVAO = 0, crosshairVBO = 0;
+
 
 
 void Init() {
@@ -68,6 +72,33 @@ void Init() {
 	player = std::make_unique<Player>(glm::vec3(0.0f, 0.0f, 0.0f));
 	appState.player = player.get();
 	worldInitialized = true;
+
+	InitCrosshair();
+}
+
+void InitCrosshair() {
+	float size = 0.02f;
+	float vertices[] = {
+
+		-size, 0.0f,
+		size, 0.0f,
+
+		0.0f, size,
+		0.0f, -size
+
+	};
+
+	glGenVertexArrays(1, &crosshairVAO);
+	glGenBuffers(1, &crosshairVBO);
+
+	glBindVertexArray(crosshairVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, crosshairVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+
+	glBindVertexArray(0);
 }
 
 void CreateExampleWorld() {
@@ -303,7 +334,7 @@ void LoadTexture() {
 void display(int width, int height) {
 	static MyShader blockShader("./Shaders/Block.vert", "./Shaders/Block.frag");
 	static MyShader gSkyShader("./Shaders/Sky.vert", "./Shaders/Sky.frag");
-
+	static MyShader crosshairShader("./Shaders/crosshair.vert", "./Shaders/crosshair.frag");
 	// delta time
 	static float lastFrameTime = 0.0f;
 	float currentTime = glfwGetTime();
@@ -402,6 +433,19 @@ void display(int width, int height) {
 
 	//chunkManager.renderAll();
 	worldManager->render();
+
+	// crosshair
+	glDisable(GL_DEPTH_TEST);
+	crosshairShader.Use();
+	crosshairShader.setVec3("uColor", glm::vec3(1.0f, 1.0f, 1.0f));
+
+	glLineWidth(3.0f);
+	glBindVertexArray(crosshairVAO);
+	glDrawArrays(GL_LINES, 0, 4);
+	glLineWidth(1.0f);
+
+	glBindVertexArray(0);
+	glEnable(GL_DEPTH_TEST);
 }
 
 int main() {
