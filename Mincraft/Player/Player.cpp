@@ -129,6 +129,34 @@ void Player::processInput(GLFWwindow* window, float deltaTime, ChunkManager& chu
 		prevRightPressed = false;
 	}
 
+	// dig block leftPress
+	if (currentHit.hit && leftState == GLFW_PRESS) {
+		glm::ivec3 target(currentHit.bx, currentHit.by, currentHit.bz);
+
+		if (!isBreaking || target != breakingBlock) {
+			isBreaking = true;
+			breakingBlock = target;
+			breakTime = 0.0f;
+		}
+		breakTime += deltaTime;
+
+		if (breakTime >= breakNeeded) {
+			Block b = chunkManager.getBlockWorld(target.x, target.y, target.z);
+
+			if (b.type != BlockType::Air) {
+				heldBlock = b.type;
+				hasHeldBlock = true;
+				chunkManager.setBlockWorld(target.x, target.y, target.z, BlockType::Air);
+			}
+			isBreaking = false;
+			breakTime = 0.0f;
+		}
+	}
+	else {
+		isBreaking = true;
+		breakTime = 0.0f;
+	}
+
 }
 
 void Player::update(float deltaTime, ChunkManager& chunkManager) {
