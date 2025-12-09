@@ -6,7 +6,7 @@ int TerrainGenerator::getHeight(int wx, int wz) const {
 	h = (h * 0.5f + 0.5f);
 
 	int height = (int)(params.baseHeight + h * params.amplitude);
-	//std::cout << "now height is: " << height << std::endl;
+	
 	return height;
 }
 

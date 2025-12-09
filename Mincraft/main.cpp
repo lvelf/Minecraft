@@ -227,7 +227,7 @@ void LoadTexture() {
 		return;
 	}
 
-	// TODO: texture mapping
+	// texture mapping
 	glGenTextures(1, &gStoneTex);
 	glBindTexture(GL_TEXTURE_2D, gStoneTex);
 
@@ -248,7 +248,7 @@ void LoadTexture() {
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	// aniso
+	// anisotropic
 	glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &maxAniso);
 	GLfloat anisoLevel = std::min(8.0f, maxAniso);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, anisoLevel);
@@ -287,43 +287,6 @@ void LoadTexture() {
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// sky dome
-	/*
-	data = SOIL_load_image("../data/sky.png", &w, &h, &channels, SOIL_LOAD_RGB);
-	if (!data) {
-		std::cerr << "Failed to load sky dome png" << std::endl;
-		std::cerr << "SOIL error: " << SOIL_last_result() << std::endl;
-		return;
-	}
-
-	glGenTextures(1, &gSkyTex);
-	glBindTexture(GL_TEXTURE_2D, gSkyTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	SOIL_free_image_data(data);*/
-	/*
-	unsigned char* sky_data = stbi_load("../data/sky.png", &w, &h, &channels, 3);
-	if (!sky_data) {
-		std::cerr << "Failed to load sky.png: " << stbi_failure_reason() << std::endl;
-		return;
-	}
-
-	glGenTextures(1, &gSkyTex);
-	glBindTexture(GL_TEXTURE_2D, gSkyTex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, sky_data);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	stbi_image_free(sky_data);*/
 	LoadCrossCubemap("../data/cubemap.png");
 	glBindTexture(GL_TEXTURE_2D, 0);
 }

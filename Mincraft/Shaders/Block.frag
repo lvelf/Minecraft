@@ -84,12 +84,9 @@ void main() {
         localUV.y += uTime * 0.05;
         localUV = fract(localUV); 
 
-        
         const float eps = 0.001;
         vec2 innerSize = waterSize * (1.0 - 2.0 * eps);
         uv = waterMin + waterSize * eps + localUV * innerSize;
-
-
     }
 
     // normal mapping 
@@ -146,7 +143,7 @@ void main() {
     float F0 = F0_base;                                
     float F  = F0 + (1.0 - F0) * pow(1.0 - VoH, 5.0); 
 
-    // Microfacet Distribution: Beckmann
+    // Beckmann
     float m  = roughness;
     float m2 = m * m;
     float NoH2 = NoH * NoH;

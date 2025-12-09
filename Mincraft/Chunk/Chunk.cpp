@@ -23,7 +23,7 @@ bool Chunk::isAirLocal(int lx, int ly, int lz, ChunkManager& chunkManager) const
 		return neighbourBlock.type == BlockType::Air;
 	}
 
-	// TODO: ChunkManager should manage this, since it need be across chunks
+	// ChunkManager should manage this, since it need be across chunks
 	return blocks[index(lx, ly, lz)].type == BlockType::Air;
 }
 
